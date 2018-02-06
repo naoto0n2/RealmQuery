@@ -12,14 +12,35 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        self.main()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    func main() {
+        self.setup()
+        
+        let realm = Realms.realm
+        let results = realm.objects(Entity.self)
+            .filter(.isSoftRemoved == false && .isActive != true)
+            .sorted(by: .id, ascending: false)
+
+        print(results)
     }
-
-
+    
+    func setup() {
+        let realm = Realms.realm
+        realm.beginWrite()
+        
+        realm.deleteAll()
+        let objects = [
+            Entity(id: "1", isSoftRemoved: false, isActive: true),
+            Entity(id: "2", isSoftRemoved: false, isActive: false),
+            Entity(id: "3", isSoftRemoved: false, isActive: true),
+            Entity(id: "4", isSoftRemoved: true, isActive: true),
+            Entity(id: "5", isSoftRemoved: true, isActive: true)
+        ]
+        realm.add(objects)
+        
+        try! realm.commitWrite()
+    }
 }
-
